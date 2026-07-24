@@ -1,59 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encuesta de Satisfacción</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+    .container { max-width: 600px; background: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: 20px auto; }
+    h2 { color: #0056b3; margin-top: 0; }
+    .greeting { font-size: 1.1em; margin-bottom: 25px; color: #555; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: bold; margin-bottom: 8px; }
+    select, input[type="text"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    textarea { height: 90px; resize: vertical; }
+    .rating-container { display: flex; justify-content: space-between; max-width: 400px; }
+    .rating-btn { padding: 8px 12px; border: 1px solid #007bff; background: #fff; color: #007bff; border-radius: 5px; cursor: pointer; }
+    .rating-btn.active { background: #007bff; color: #fff; }
+    button[type="submit"] { background: #28a745; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; width: 100%; font-weight: bold; }
+    button[type="submit"]:hover { background: #218838; }
+    #message { display: none; text-align: center; font-size: 1.2em; color: #28a745; padding: 20px; }
+  </style>
+</head>
+<body>
+
+<div class="container" id="survey-card">
+  <h2 id="title">Tu opinión nos importa</h2>
+  <p class="greeting" id="greeting-text">Hola, gracias por dedicar unos minutos a responder.</p>
+
+  <form id="survey-form">
+    <!-- P1: Relevancia / Calificación -->
+    <div class="form-group">
+      <label id="q1-label">1. ¿Qué tan relevante es hoy nuestra solución para tus necesidades actuales? (1 al 10)</label>
+      <select id="q1" required>
+        <option value="">Selecciona una opción...</option>
+        <option value="10">10 - Imprescindible</option>
+        <option value="9">9</option>
+        <option value="8">8</option>
+        <option value="7">7</option>
+        <option value="6">6</option>
+        <option value="5">5 - Neutro</option>
+        <option value="4">4</option>
+        <option value="3">3</option>
+        <option value="2">2</option>
+        <option value="1">1 - Nada relevante</option>
+      </select>
+    </div>
+
+    <!-- P2: Frecuencia -->
+    <div class="form-group">
+      <label id="q2-label">2. ¿Con qué frecuencia sueles utilizar o comprar este tipo de solución?</label>
+      <select id="q2" required>
+        <option value="">Selecciona una opción...</option>
+        <option value="semanal">Semanal</option>
+        <option value="mensual">Mensual</option>
+        <option value="trimestral">Trimestral / Ocasional</option>
+        <option value="anual">Anual / Estacional</option>
+        <option value="no_aplica">Ya no utilizo este tipo de solución</option>
+      </select>
+    </div>
+
+    <!-- P3: Razón Inactividad / Oportunidad -->
+    <div class="form-group">
+      <label id="q3-label">3. ¿Cuál ha sido la principal razón de tu falta de actividad reciente?</label>
+      <select id="q3" required>
+        <option value="">Selecciona una opción...</option>
+        <option value="precio">Presupuesto / Precio</option>
+        <option value="competencia">Cambiamos de proveedor</option>
+        <option value="servicio">Atención o nivel de servicio</option>
+        <option value="sin_demanda">Proceso o proyecto pausado</option>
+        <option value="otro">Otro motivo</option>
+      </select>
+    </div>
+
+    <!-- P4: Pregunta Abierta -->
+    <div class="form-group">
+      <label id="q4-label">4. ¿Qué tendría que pasar para que retomes o incrementes el uso de nuestra solución?</label>
+      <textarea id="q4" placeholder="Escribe aquí tu respuesta..." required></textarea>
+    </div>
+
+    <button type="submit" id="submit-btn">Enviar Respuestas</button>
+  </form>
+</div>
+
+<div class="container" id="message">
+  <h2>¡Muchas gracias!</h2>
+  <p>Tus respuestas han sido registradas. Nos ayudan mucho a seguir mejorando.</p>
+</div>
+
 <script>
-  // 1. LOGOS SEGÚN PAÍS
-  var LOGO_MEXICO = "https://lh3.googleusercontent.com/d/1q8BvfZf_gvE7Z7j5JZA2bMzxtxG7vsYG";
-  var LOGO_OTROS  = "https://lh3.googleusercontent.com/d/1Bdr6iTq7ZnhCxUD6BGBqTsxAd7DpXdFo";
-
-  // 2. PARÁMETROS URL (?id=...&tipo=...&nombre=...&pais=...)
+  // 1. CAPTURAR PARÁMETROS URL (?id=...&tipo=...&nombre=...)
   const urlParams = new URLSearchParams(window.location.search);
-  const clientId = urlParams.get('id') || 'SIN_ID';
-  const tipoEncuesta = urlParams.get('tipo') ? urlParams.get('tipo').toLowerCase() : 'encuesta_silencio';
-  const nombreCliente = urlParams.get('nombre') ? decodeURIComponent(urlParams.get('nombre')) : '';
-  const paisCliente = urlParams.get('pais') ? decodeURIComponent(urlParams.get('pais')).toLowerCase() : '';
+  const clientId = urlParams.get('id') || 'ANONIMO';
+  const tipoEncuesta = urlParams.get('tipo') || 'silencio';
+  const nombreCliente = urlParams.get('nombre') ? decodeURIComponent(urlParams.get('nombre')) : 'Estimado cliente';
 
-  // 3. LOGO DINÁMICO
-  const imgElement = document.getElementById('company-logo');
-  if (paisCliente.includes('mexico') || paisCliente.includes('méxico')) {
-    imgElement.src = LOGO_MEXICO;
-  } else {
-    imgElement.src = LOGO_OTROS;
-  }
+  // 2. PERSONALIZAR INTERFAZ Y PREGUNTAS
+  document.getElementById('greeting-text').innerText = `Hola ${nombreCliente}, gracias por dedicar unos minutos a responder.`;
 
-  if (nombreCliente !== '') {
-    document.getElementById('greeting-text').innerText = `Hola ${nombreCliente}, nos gustaría conocer tu opinión.`;
-  }
-
-  // 4. ADAPTACIÓN DE PREGUNTAS SEGÚN LAS 3 AUDIENCIAS
-  if (tipoEncuesta === 'perdido_historico') {
-    // AUDIENCIA 2: PERDIDO HISTÓRICO
-    document.getElementById('q1-label').innerText = '1. ¿Qué tan relevante fue en su momento nuestra solución para tu operación? (1 al 10)';
-    document.getElementById('q2-label').innerText = '2. ¿Actualmente sigues requiriendo o comprando este tipo de soluciones?';
-    document.getElementById('q3-label').innerText = '3. ¿Cuál fue la razón principal por la que se discontinuó la compra con nosotros?';
-    document.getElementById('q4-label').innerText = '4. ¿Qué tendría que cambiar para que vuelvas a considerarnos en el futuro?';
-
-  } else if (tipoEncuesta === 'prevencion_churn_ml') {
-    // AUDIENCIA 3: PREVENCIÓN CHURN ML
+  // Adaptar preguntas para la Encuesta de Prevención Churn ML
+  if (tipoEncuesta === 'prevencion_churn_ml') {
     document.getElementById('q1-label').innerText = '1. ¿Cómo calificarías tu experiencia reciente con nuestro servicio/atención? (1 al 10)';
-    document.getElementById('q2-label').innerText = '2. ¿Nuestra solución actualmente cumple con tus expectativas operativas?';
+    document.getElementById('q2-label').innerText = '2. ¿Nuestra solución sigue cubriendo tus expectativas operativas?';
     document.getElementById('q3-label').innerText = '3. ¿Hay algún aspecto prioritario que debamos mejorar de inmediato?';
-    document.getElementById('q4-label').innerText = '4. ¿Qué podemos hacer hoy para fortalecer nuestra relación contigo?';
-
-  } else {
-    // AUDIENCIA 1: ENCUESTA SILENCIO (POR DEFECTO)
-    document.getElementById('q1-label').innerText = '1. ¿Qué tan relevante es hoy nuestra solución para tus necesidades actuales? (1 al 10)';
-    document.getElementById('q2-label').innerText = '2. ¿Con qué frecuencia sueles utilizar o comprar este tipo de solución?';
-    document.getElementById('q3-label').innerText = '3. ¿Cuál ha sido la principal razón por la que no has tenido actividad reciente?';
-    document.getElementById('q4-label').innerText = '4. ¿Qué tendría que pasar para que retomes el uso de nuestra solución?';
+    document.getElementById('q4-label').innerText = '4. ¿Qué podemos hacer hoy para mejorar nuestra relación contigo?';
   }
 
-  // 5. URL WEB APP (Se actualizará cuando implementemos la Web App de Apps Script)
-  const WEBHOOK_URL = "AQUI_PEGA_TU_URL_DE_APPS_SCRIPT";
+  // 3. ENVÍO DE DATOS A GOOGLE SHEETS
+  // ⚠️ AQUÍ PEGARÁS EL WEBHOOK APP SCRIPT (Lo generamos en el siguiente paso)
+  const WEBHOOK_URL = "URL_DE_TU_WEB_APP_APPS_SCRIPT";
 
-  // 6. ENVÍO
   document.getElementById('survey-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    const btn = document.getElementById('submit-btn');
-    btn.disabled = true;
-    btn.innerText = "Enviando respuestas...";
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('submit-btn').innerText = "Enviando...";
 
     const payload = {
       id: clientId,
@@ -71,12 +130,14 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     }).then(() => {
-      document.getElementById('form-container').style.display = 'none';
-      document.getElementById('thank-you-message').style.display = 'block';
+      document.getElementById('survey-card').style.display = 'none';
+      document.getElementById('message').style.display = 'block';
     }).catch(err => {
-      alert('Ocurrió un inconveniente al enviar tu respuesta.');
-      btn.disabled = false;
-      btn.innerText = "Enviar Respuestas";
+      alert('Ocurrió un error al enviar. Por favor intenta nuevamente.');
+      document.getElementById('submit-btn').disabled = false;
     });
   });
 </script>
+
+</body>
+</html>
