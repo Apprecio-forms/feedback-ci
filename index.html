@@ -61,10 +61,10 @@
             </div>
             
             <form id="surveyForm">
-                <input type="hidden" name="email" id="emailInput">
+                <!-- CAMPOS OCULTOS PARA RASTREO -->
+                <input type="hidden" name="id" id="idInput">
                 <input type="hidden" name="pais" id="paisInput">
                 <input type="hidden" name="audiencia" id="audienciaInput">
-                <input type="hidden" name="id_envio" id="idEnvioInput">
 
                 <!-- Pregunta 1 (FIJA) -->
                 <label class="question-label">1. ¿Qué tan relevante es hoy nuestra solución para tus necesidades actuales?<span class="required-star">*</span></label>
@@ -152,23 +152,22 @@
     var LOGO_MEXICO = "https://lh3.googleusercontent.com/d/1q8BvfZf_gvE7Z7j5JZA2bMzxtxG7vsYG";
     var LOGO_OTROS  = "https://lh3.googleusercontent.com/d/1Bdr6iTq7ZnhCxUD6BGBqTsxAd7DpXdFo";
 
-    let emailFromUrl = "";
+    let idFromUrl = "";
     let paisFromUrl = "";
     let audienciaFromUrl = "";
-    let idEnvioFromUrl = "";
 
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         
-        emailFromUrl = urlParams.get('utm_email') || urlParams.get('email') || "";
+        // Lee el ID único (ej. ENC-26-0724-ENT-A3)
+        idFromUrl = urlParams.get('id') || urlParams.get('id_envio') || "";
         paisFromUrl = urlParams.get('pais') || "";
         audienciaFromUrl = urlParams.get('audiencia') || urlParams.get('categoria') || urlParams.get('aud') || "";
-        idEnvioFromUrl = urlParams.get('id_envio') || "";
         
-        if (emailFromUrl) document.getElementById('emailInput').value = emailFromUrl;
+        // Guardar en campos ocultos
+        if (idFromUrl) document.getElementById('idInput').value = idFromUrl;
         if (paisFromUrl) document.getElementById('paisInput').value = paisFromUrl;
         if (audienciaFromUrl) document.getElementById('audienciaInput').value = audienciaFromUrl;
-        if (idEnvioFromUrl) document.getElementById('idEnvioInput').value = idEnvioFromUrl;
 
         // 1. LÓGICA DINÁMICA DE LOGO POR PAÍS
         const paisNormalizado = paisFromUrl.trim().toLowerCase();
@@ -178,7 +177,6 @@
         document.getElementById('appLogoSuccess').src = logoTarget;
 
         // 2. LÓGICA DINÁMICA DE PREGUNTAS
-        // Acepta 'churn', o simplemente el código discreto 'c' o '1'
         const audNormalizada = audienciaFromUrl.trim().toLowerCase();
         const esChurn = audNormalizada.includes("churn") || audNormalizada === "c" || audNormalizada === "1";
         
@@ -186,7 +184,6 @@
             document.getElementById('block-churn').style.display = 'block';
             document.getElementById('txtMejora').required = true;
         } else {
-            // Por defecto ('silencio', 's', '2' o cualquier otro)
             document.getElementById('block-inactividad').style.display = 'block';
             document.getElementById('txtRetomar').required = true;
         }
