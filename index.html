@@ -1,244 +1,479 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Encuesta de Opinión - Apprecio</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
     <style>
+
         :root { --apprecio-pink: #ff3366; --dark-text: #2d2d2d; }
+
         body { font-family: 'Poppins', sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; padding: 20px; align-items: center; min-height: 100vh; margin: 0; }
+
         .card { background: white; max-width: 550px; width: 100%; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #ddd; box-sizing: border-box; }
+
         
+
         .logo-container { text-align:center; margin-bottom: 25px; }
-        .logo-img { width: 180px; height: auto; display: inline-block; }
+
+        .logo-img { width: 120px; height: auto; display: inline-block; }
+
+
 
         .introduccion { text-align: center; color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+
         
+
         .question-label { display: block; font-weight: 600; margin-bottom: 12px; font-size: 14px; color: var(--dark-text); }
+
         .required-star { color: var(--apprecio-pink); margin-left: 3px; }
+
         
+
         .input-field { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 12px; box-sizing: border-box; margin-bottom: 25px; font-family: inherit; font-size: 14px; transition: 0.3s; }
+
         .input-field:focus { border-color: var(--apprecio-pink); outline: none; border-width: 2px; }
 
+
+
         /* Escala 1 al 10 */
+
         .scale-10 { display: flex; justify-content: space-between; gap: 4px; margin-bottom: 5px; }
+
         .scale-item { flex: 1; text-align: center; }
+
         .scale-item input { display: none; }
+
         .scale-item label { display: block; border: 1px solid #eee; padding: 10px 0; cursor: pointer; border-radius: 8px; background: #fff; font-weight: 600; transition: 0.2s; font-size: 13px; }
+
         .scale-item input:checked + label { background: var(--apprecio-pink); color: white; border-color: var(--apprecio-pink); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(255, 51, 102, 0.3); }
+
         .legend { display: flex; justify-content: space-between; color: #999; font-size: 11px; margin-bottom: 30px; }
 
+
+
         /* Contenedores de Opciones */
+
         .options-container { margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px; }
+
         .option-item { display: flex; align-items: center; background: #f9f9f9; padding: 12px 15px; border-radius: 10px; border: 1px solid #eee; cursor: pointer; transition: 0.2s; font-size: 13px; color: var(--dark-text); }
+
         .option-item:hover { background: #f0f0f0; }
+
         .option-item input { margin-right: 12px; accent-color: var(--apprecio-pink); transform: scale(1.2); }
+
         
+
         .text-detail { margin-top: 8px; margin-bottom: 15px; display: none; }
 
+
+
         /* Clases de Control Dinámico */
+
         .block-dynamic { display: none; }
+
         .seccion-titulo { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--apprecio-pink); margin-bottom: 10px; letter-spacing: 1px; }
+
         textarea { min-height: 100px; resize: none; width: 100%; }
 
+
+
         .btn-submit { width: 100%; background: var(--apprecio-pink); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 #d11f4a; font-size: 16px; margin-top: 10px; transition: 0.1s; text-transform: uppercase; }
+
         .btn-submit:active { transform: translateY(4px); box-shadow: 0 0px 0 #d11f4a; }
+
         .btn-submit:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+
         
+
         #success-msg { display: none; text-align: center; padding: 20px 0; }
+
         .success-icon { font-size: 60px; margin-bottom: 15px; display: block; }
+
     </style>
+
 </head>
+
 <body>
+
     <div class="card">
+
         <div id="form-content">
+
             <div class="logo-container">
+
                 <img id="appLogo" src="" alt="Apprecio Logo" class="logo-img">
+
             </div>
+
+
 
             <div class="introduccion">
+
                 Tu opinión es muy valiosa para nosotros. Por favor, tómate un minuto para responder las siguientes preguntas.
+
             </div>
+
             
+
             <form id="surveyForm">
+
                 <input type="hidden" name="email" id="emailInput">
+
                 <input type="hidden" name="pais" id="paisInput">
+
                 <input type="hidden" name="audiencia" id="audienciaInput">
 
+
+
                 <!-- Pregunta 1 (FIJA) -->
+
                 <label class="question-label">1. ¿Qué tan relevante es hoy nuestra solución para tus necesidades actuales?<span class="required-star">*</span></label>
+
                 <div class="scale-10">
+
                     <div class="scale-item"><input type="radio" name="relevancia" value="1" id="q1_1" required><label for="q1_1">1</label></div>
+
                     <div class="scale-item"><input type="radio" name="relevancia" value="2" id="q1_2"><label for="q1_2">2</label></div>
+
                     <div class="scale-item"><input type="radio" name="relevancia" value="3" id="q1_3"><label for="q1_3">3</label></div>
+
                     <div class="scale-item"><input type="radio" name="relevancia" value="4" id="q1_4"><label for="q1_4">4</label></div>
+
                     <div class="scale-item"><input type="radio" name="relevancia" value="5" id="q1_5"><label for="q1_5">5</label></div>
+
                     <div class="scale-item"><input type="radio" name="relevancia" value="6" id="q1_6"><label for="q1_6">6</label></div>
+
                     <div class="scale-item"><input type="radio" name="relevancia" value="7" id="q1_7"><label for="q1_7">7</label></div>
+
                     <div class="scale-item"><input type="radio" name="relevancia" value="8" id="q1_8"><label for="q1_8">8</label></div>
+
                     <div class="scale-item"><input type="radio" name="relevancia" value="9" id="q1_9"><label for="q1_9">9</label></div>
+
                     <div class="scale-item"><input type="radio" name="relevancia" value="10" id="q1_10"><label for="q1_10">10</label></div>
+
                 </div>
+
                 <div class="legend"><span>Nada relevante</span><span>Muy relevante</span></div>
 
+
+
                 <!-- Pregunta 2 (FIJA) -->
+
                 <label class="question-label">2. ¿Con qué frecuencia se utiliza este tipo de solución en tu empresa o equipo?<span class="required-star">*</span></label>
+
                 <div class="options-container">
+
                     <label class="option-item"><input type="radio" name="frecuencia_uso" value="Recurrente (mensual)" required> Recurrente (mensual)</label>
+
                     <label class="option-item"><input type="radio" name="frecuencia_uso" value="Frecuente (más de 6 veces al año)"> Frecuente (más de 6 veces al año)</label>
+
                     <label class="option-item"><input type="radio" name="frecuencia_uso" value="Frecuencia media (entre 3 a 6 veces al año)"> Frecuencia media (entre 3 a 6 veces al año)</label>
+
                     <label class="option-item"><input type="radio" name="frecuencia_uso" value="Frecuencia baja (entre 1 a 2 veces al año)"> Frecuencia baja (entre 1 a 2 veces al año)</label>
+
                     <label class="option-item"><input type="radio" name="frecuencia_uso" value="Únicamente bajo demanda para proyectos puntuales"> Únicamente bajo demanda para proyectos puntuales</label>
+
                 </div>
+
+
 
                 <!-- ================= BLOQUE SILENCIO / PERDIDO HISTÓRICO ================= -->
+
                 <div id="block-inactividad" class="block-dynamic">
+
                     <!-- Pregunta 3 (Silencio/Perdido) -->
+
                     <label class="question-label">3. ¿Cuál ha sido la principal razón por la que no has tenido actividad reciente?<span class="required-star">*</span></label>
+
                     <div class="options-container">
+
                         <label class="option-item"><input type="checkbox" name="razon_inactividad" value="Cambio de prioridades o presupuestos en mi empresa"> Cambio de prioridades o presupuestos en mi empresa</label>
+
                         <label class="option-item"><input type="checkbox" name="razon_inactividad" value="Mis necesidades cambiaron, ya no requiero este tipo de solución"> Mis necesidades cambiaron, ya no requiero este tipo de solución</label>
+
                         <label class="option-item"><input type="checkbox" name="razon_inactividad" value="Encontré otra alternativa u otro proveedor" id="chkProveedor"> Encontré otra alternativa u otro proveedor</label>
+
                         <input type="text" name="proveedor_cual" id="inputProveedor" class="input-field text-detail" placeholder="¿Cuál proveedor/alternativa?">
+
                         
+
                         <label class="option-item"><input type="checkbox" name="razon_inactividad" value="Precios o costos por encima de lo contemplado"> Precios o costos por encima de lo contemplado</label>
+
                         <label class="option-item"><input type="checkbox" name="razon_inactividad" value="Tuve un inconveniente con el producto, servicio o la atención"> Tuve un inconveniente con el producto, servicio o la atención</label>
+
                         <label class="option-item"><input type="checkbox" name="razon_inactividad" value="No he tenido proyectos o demanda activa"> No he tenido proyectos o demanda activa</label>
+
                         <label class="option-item"><input type="checkbox" name="razon_inactividad" value="Proceso de compra complejo"> Proceso de compra complejo</label>
+
                         <label class="option-item"><input type="checkbox" name="razon_inactividad" value="Otro" id="chkOtro"> Otro</label>
+
                         <input type="text" name="razon_otro" id="inputOtro" class="input-field text-detail" placeholder="Especifica el motivo...">
+
                     </div>
+
+
 
                     <!-- Pregunta 4 (Silencio/Perdido) -->
+
                     <div class="seccion-titulo">Perspectiva a futuro</div>
+
                     <label class="question-label">4. ¿Qué tendría que pasar para que retomes el uso de nuestra solución?<span class="required-star">*</span></label>
+
                     <textarea id="txtRetomar" name="comentario_retomar" class="input-field" placeholder="Escribe tus comentarios aquí..."></textarea>
+
                 </div>
+
+
 
                 <!-- ================= BLOQUE PREVENCIÓN CHURN ML ================= -->
+
                 <div id="block-churn" class="block-dynamic">
+
                     <!-- Pregunta 3 (Churn ML) -->
+
                     <label class="question-label">3. ¿Cuál ha sido el principal desafío que has enfrentado al trabajar con nosotros en este último tiempo?<span class="required-star">*</span></label>
+
                     <div class="options-container">
+
                         <label class="option-item"><input type="checkbox" name="desafios" value="Relación costo-beneficio / Ajuste de presupuesto"> Relación costo-beneficio / Ajuste de presupuesto</label>
+
                         <label class="option-item"><input type="checkbox" name="desafios" value="Tiempo de respuesta o calidad en la atención"> Tiempo de respuesta o calidad en la atención</label>
+
                         <label class="option-item"><input type="checkbox" name="desafios" value="Cambios internos en mi empresa o equipo"> Cambios internos en mi empresa o equipo</label>
+
                         <label class="option-item"><input type="checkbox" name="desafios" value="Falta de funcionalidades o soluciones más adaptadas a mi operación actual"> Falta de funcionalidades o soluciones más adaptadas a mi operación actual</label>
+
                         <label class="option-item"><input type="checkbox" name="desafios" value="Ninguno, mi experiencia ha sido fluida"> Ninguno, mi experiencia ha sido fluida</label>
+
                         <label class="option-item"><input type="checkbox" name="desafios" value="Otro" id="chkOtroDesafio"> Otro</label>
+
                         <input type="text" name="desafio_otro" id="inputOtroDesafio" class="input-field text-detail" placeholder="Especifica el desafío...">
+
                     </div>
 
+
+
                     <!-- Pregunta 4 (Churn ML) -->
+
                     <div class="seccion-titulo">Mejora continua</div>
+
                     <label class="question-label">4. ¿Qué ajuste o mejora podríamos hacer hoy para seguir facilitando tu trabajo diario con nosotros?<span class="required-star">*</span></label>
+
                     <textarea id="txtMejora" name="comentario_mejora" class="input-field" placeholder="Escribe tus sugerencias aquí..."></textarea>
+
                 </div>
 
+
+
                 <button type="submit" class="btn-submit" id="submitBtn">ENVIAR ENCUESTA</button>
+
             </form>
+
         </div>
+
+
 
         <div id="success-msg">
+
             <div class="logo-container">
+
                 <img id="appLogoSuccess" src="" alt="Apprecio Logo" class="logo-img">
+
             </div>
+
             <span class="success-icon">✅</span>
+
             <h2 style="font-weight: 800; color: var(--dark-text); margin-top: 0;">¡Muchas gracias!</h2>
+
             <p style="color: #666; line-height: 1.6;">Tu feedback ha sido enviado con éxito.</p>
+
         </div>
+
     </div>
 
+
+
     <script>
-    // ============================================================
-    // CONFIGURACIÓN DE LOGOS POR PAÍS
-    // ============================================================
-    var LOGO_MEXICO = "https://lh3.googleusercontent.com/d/1q8BvfZf_gvE7Z7j5JZA2bMzxtxG7vsYG";
-    var LOGO_OTROS  = "https://lh3.googleusercontent.com/d/1Bdr6iTq7ZnhCxUD6BGBqTsxAd7DpXdFo";
+
+    // URLs de Logos
+
+    const LOGO_MEXICO_URL = "https://lh3.googleusercontent.com/d/1BgDDHoP3ve2r1k3-Z27LMA_YamEQkFee"; // Remplazar por URL logo México si aplica
+
+    const LOGO_OTRO_URL = "https://lh3.googleusercontent.com/d/1BgDDHoP3ve2r1k3-Z27LMA_YamEQkFee";   // Logo Global / Otros países
+
+
 
     let emailFromUrl = "";
+
     let paisFromUrl = "";
+
     let audienciaFromUrl = "";
+
     let idEnvioFromUrl = "";
 
+
+
     window.onload = function() {
+
         const urlParams = new URLSearchParams(window.location.search);
+
         
+
         emailFromUrl = urlParams.get('utm_email') || urlParams.get('email') || "";
+
         paisFromUrl = urlParams.get('pais') || "";
-        audienciaFromUrl = urlParams.get('audiencia') || urlParams.get('categoria') || urlParams.get('fase') || "";
-        idEnvioFromUrl = urlParams.get('id_envio') || urlParams.get('id') || "";
+
+        audienciaFromUrl = urlParams.get('audiencia') || urlParams.get('categoria') || "";
+
+        idEnvioFromUrl = urlParams.get('id_envio') || "";
+
         
-        // Asignar parámetros a los campos ocultos del formulario
+
+        // Guardar valores en campos ocultos
+
         if (emailFromUrl) document.getElementById('emailInput').value = emailFromUrl;
+
         if (paisFromUrl) document.getElementById('paisInput').value = paisFromUrl;
+
         if (audienciaFromUrl) document.getElementById('audienciaInput').value = audienciaFromUrl;
 
-        // ── LÓGICA DE LOGO SEGÚN PAÍS (MÉXICO vs OTROS) ──
+
+
+        // 1. LÓGICA DINÁMICA DE LOGO POR PAÍS
+
         const paisNormalizado = paisFromUrl.trim().toLowerCase();
-        const logoTarget = (paisNormalizado === "méxico" || paisNormalizado === "mexico" || paisNormalizado === "mx") ? LOGO_MEXICO : LOGO_OTROS;
+
+        const logoTarget = (paisNormalizado === "méxico" || paisNormalizado === "mexico") ? LOGO_MEXICO_URL : LOGO_OTRO_URL;
+
         
+
         document.getElementById('appLogo').src = logoTarget;
+
         document.getElementById('appLogoSuccess').src = logoTarget;
 
-        // ── LÓGICA DE PREGUNTAS SEGÚN AUDIENCIA ──
+
+
+        // 2. LÓGICA DINÁMICA DE PREGUNTAS POR AUDIENCIA
+
         const audNormalizada = audienciaFromUrl.trim().toLowerCase();
+
         
+
         if (audNormalizada.includes("churn")) {
+
             // Activar bloque Churn ML
+
             document.getElementById('block-churn').style.display = 'block';
+
             document.getElementById('txtMejora').required = true;
+
         } else {
-            // Por defecto (Silencio / Perdido Histórico)
+
+            // Por defecto o si es 'silencio' / 'perdido_historico'
+
             document.getElementById('block-inactividad').style.display = 'block';
+
             document.getElementById('txtRetomar').required = true;
+
         }
+
     };
+
+
 
     // Control visual de inputs de texto condicionales
+
     document.getElementById('chkProveedor').addEventListener('change', function() {
+
         document.getElementById('inputProveedor').style.display = this.checked ? 'block' : 'none';
-    });
-    document.getElementById('chkOtro').addEventListener('change', function() {
-        document.getElementById('inputOtro').style.display = this.checked ? 'block' : 'none';
-    });
-    document.getElementById('chkOtroDesafio').addEventListener('change', function() {
-        document.getElementById('inputOtroDesafio').style.display = this.checked ? 'block' : 'none';
+
     });
 
-    // URL de Apps Script conectada
+    document.getElementById('chkOtro').addEventListener('change', function() {
+
+        document.getElementById('inputOtro').style.display = this.checked ? 'block' : 'none';
+
+    });
+
+    document.getElementById('chkOtroDesafio').addEventListener('change', function() {
+
+        document.getElementById('inputOtroDesafio').style.display = this.checked ? 'block' : 'none';
+
+    });
+
+
+
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzG106P9LmNFwM2oBenXDhIu6YSKVk8ZYRlG0TP63qzQwRuYM6WqvnKH_AzQU9YsWc1/exec"; 
 
-    // Proceso de envío de respuestas
+
+
     document.getElementById('surveyForm').onsubmit = function(e) {
+
         e.preventDefault();
+
         const btn = document.getElementById('submitBtn');
+
         
+
         btn.disabled = true;
+
         btn.innerText = 'ENVIANDO...';
 
+
+
         const formData = new FormData(this);
+
         const params = new URLSearchParams(formData);
 
+
+
         if (emailFromUrl) params.append('email', emailFromUrl);
+
         if (paisFromUrl) params.append('pais', paisFromUrl);
+
         if (audienciaFromUrl) params.append('audiencia', audienciaFromUrl);
+
         if (idEnvioFromUrl) params.append('id_envio', idEnvioFromUrl);
 
+
+
         fetch(WEB_APP_URL + "?" + params.toString(), {
+
             method: 'GET',
+
             mode: 'no-cors'
+
         }).then(() => {
+
             document.getElementById('form-content').style.display = 'none';
+
             document.getElementById('success-msg').style.display = 'block';
+
             window.scrollTo(0,0);
+
         }).catch(err => {
+
             alert("Error al enviar la encuesta.");
+
             btn.disabled = false;
+
             btn.innerText = 'ENVIAR ENCUESTA';
+
         });
+
     };
+
     </script>
+
 </body>
+
 </html>
